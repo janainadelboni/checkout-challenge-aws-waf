@@ -74,6 +74,13 @@
       box-shadow: var(--shadow-card);
       display: flex;
       flex-direction: column;
+      position: relative;
+    }
+    .frame.dimmed > .top-bar,
+    .frame.dimmed > .content,
+    .frame.dimmed > .frame-footer {
+      filter: blur(1px);
+      pointer-events: none;
     }
 
     /* Top bar com logo */
@@ -307,24 +314,162 @@
     }
     .demo-toggle input { cursor: pointer; }
 
-    /* Checkbox manual */
-    .manual-check {
-      display: flex;
+    /* Overlay AWS WAF CAPTCHA */
+    .captcha-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 19, 36, 0.55);
+      display: none;
       align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+      animation: fadeIn 0.2s ease;
+    }
+    .captcha-overlay.show { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .captcha-modal {
       width: 100%;
       max-width: 320px;
-      cursor: pointer;
-      background: var(--surface);
-      transition: all 0.15s;
-      margin-bottom: 16px;
+      background: #FFFFFF;
+      border-radius: 4px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      overflow: hidden;
+      animation: popIn 0.25s ease;
     }
-    .manual-check:hover { border-color: var(--brand); background: var(--brand-soft); }
-    .manual-check input { width: 18px; height: 18px; accent-color: var(--brand); cursor: pointer; }
-    .manual-check label { font-size: 14px; cursor: pointer; flex: 1; text-align: left; }
+    @keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .captcha-head {
+      padding: 12px 16px;
+      border-bottom: 1px solid #E4E4E4;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #555;
+    }
+    .captcha-head-brand { display: flex; align-items: center; gap: 6px; font-weight: 600; letter-spacing: 0.02em; }
+    .aws-mark {
+      background: #232F3E;
+      color: #FF9900;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 2px;
+      letter-spacing: 0.04em;
+    }
+
+    .captcha-body { padding: 16px; text-align: center; }
+    .captcha-prompt {
+      font-size: 13px;
+      color: #1A1A1A;
+      margin: 0 0 12px;
+      font-weight: 500;
+    }
+
+    /* Área do puzzle */
+    .puzzle-stage {
+      position: relative;
+      width: 100%;
+      height: 160px;
+      background: linear-gradient(135deg, #6B8FB5 0%, #4A6885 40%, #C4956B 100%);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .puzzle-hole {
+      position: absolute;
+      top: 60px; left: 60px;
+      width: 40px; height: 40px;
+      background: rgba(0,0,0,0.45);
+      border-radius: 4px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .puzzle-piece {
+      position: absolute;
+      top: 60px; left: 20px;
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, #6B8FB5, #4A6885);
+      border-radius: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    /* Slider de arrastar */
+    .slider-track {
+      position: relative;
+      width: 100%;
+      height: 36px;
+      background: #F3F3F3;
+      border: 1px solid #DDD;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+      margin-bottom: 12px;
+      font-size: 11px;
+      color: #999;
+      justify-content: center;
+    }
+    .slider-handle {
+      position: absolute;
+      left: 4px;
+      top: 3px;
+      width: 28px;
+      height: 28px;
+      background: #FFF;
+      border: 1px solid #CCC;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      cursor: grab;
+    }
+    .slider-handle::before {
+      content: "›";
+      color: #666;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .captcha-controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+    .captcha-controls button {
+      background: transparent;
+      border: 1px solid #DDD;
+      width: 30px;
+      height: 30px;
+      border-radius: 2px;
+      cursor: pointer;
+      color: #555;
+      display: grid;
+      place-items: center;
+    }
+    .captcha-controls button:hover { background: #F5F5F5; }
+    .captcha-controls svg { width: 14px; height: 14px; }
+
+    .captcha-foot {
+      padding: 8px 16px;
+      border-top: 1px solid #E4E4E4;
+      font-size: 10px;
+      color: #888;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Hint da nossa página atrás */
+    .waiting-hint {
+      text-align: center;
+      max-width: 280px;
+      margin: 0 auto;
+    }
 
     .error-detail {
       background: var(--danger-soft);
@@ -402,26 +547,15 @@
         <p style="font-size: 12px; color: var(--text-soft); margin: 0;">Redirecionando…</p>
       </div>
 
-      <!-- ESTADO: MANUAL (fallback se o desafio automático falhar) -->
-      <div class="state" data-state="manual">
+      <!-- ESTADO: CAPTCHA (widget AWS WAF aparece por cima) -->
+      <div class="state" data-state="captcha">
         <div class="icon-wrap manual">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M12 8v4M12 16h.01"/>
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
         </div>
-        <h1>Confirme que é você</h1>
-        <p class="lead">Para continuar com segurança, marque a confirmação abaixo. Sua compra está protegida.</p>
-
-        <label class="manual-check" for="not-robot">
-          <input type="checkbox" id="not-robot" />
-          <label for="not-robot">Sou uma pessoa real, não um robô</label>
-        </label>
-
-        <button class="btn btn-primary" onclick="setState('success')">
-          Continuar para o pagamento
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </button>
+        <h1>Verificação adicional</h1>
+        <p class="lead waiting-hint">Complete o desafio na janela ao lado para confirmar seu acesso. Não feche esta página.</p>
       </div>
 
       <!-- ESTADO: ERRO -->
@@ -451,6 +585,47 @@
 
     </div>
 
+    <!-- Overlay AWS WAF CAPTCHA (visual fixo da AWS, renderizado por cima da nossa UI) -->
+    <div class="captcha-overlay" id="captcha-overlay" role="dialog" aria-modal="true" aria-label="Desafio AWS WAF">
+      <div class="captcha-modal">
+        <div class="captcha-head">
+          <div class="captcha-head-brand">
+            <span class="aws-mark">AWS</span>
+            <span>WAF</span>
+          </div>
+          <span style="opacity: 0.5;">ⓘ</span>
+        </div>
+
+        <div class="captcha-body">
+          <p class="captcha-prompt">Arraste a peça para completar o quebra-cabeça</p>
+
+          <div class="puzzle-stage">
+            <div class="puzzle-hole"></div>
+            <div class="puzzle-piece"></div>
+          </div>
+
+          <div class="slider-track">
+            <div class="slider-handle"></div>
+            <span>Arraste para a direita</span>
+          </div>
+
+          <div class="captcha-controls">
+            <button title="Recarregar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg>
+            </button>
+            <button title="Áudio">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4zM15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="captcha-foot">
+          <span>Powered by AWS WAF</span>
+          <span>Privacy · Terms</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Footer -->
     <footer class="frame-footer">
       <div class="trust-row">
@@ -477,14 +652,18 @@
       <div class="demo-group" id="state-group">
         <button class="demo-btn active" data-state="verifying" onclick="setState('verifying')">Verificando</button>
         <button class="demo-btn" data-state="success" onclick="setState('success')">Sucesso</button>
-        <button class="demo-btn" data-state="manual" onclick="setState('manual')">Manual (fallback)</button>
+        <button class="demo-btn" data-state="captcha" onclick="setState('captcha')">Captcha AWS</button>
         <button class="demo-btn" data-state="error" onclick="setState('error')">Erro</button>
       </div>
 
-      <label class="demo-toggle" style="margin-left: auto;">
-        <input type="checkbox" id="auto-success" />
+      <label class="demo-toggle">
+        <input type="checkbox" id="auto-success" checked />
         <span>Auto avançar para sucesso após 2.5s</span>
       </label>
+
+      <span style="margin-left: auto; font-size: 11px; color: #94A3B8; font-style: italic; max-width: 260px; text-align: right;">
+        ⚠️ O modal "Captcha AWS" tem visual fixo pela AWS WAF — temos pouco controle de customização.
+      </span>
     </div>
   </div>
 
@@ -497,18 +676,24 @@
         btn.classList.toggle('active', btn.dataset.state === name);
       });
 
+      const isCaptcha = name === 'captcha';
+      document.getElementById('captcha-overlay').classList.toggle('show', isCaptcha);
+      document.querySelector('.frame').classList.toggle('dimmed', isCaptcha);
+
       if (name === 'verifying' && document.getElementById('auto-success').checked) {
         clearTimeout(window.__autoTimer);
         window.__autoTimer = setTimeout(() => setState('success'), 2500);
       }
     }
 
-    // Inicializa com auto-avanço desligado
     document.getElementById('auto-success').addEventListener('change', (e) => {
       if (e.target.checked && document.querySelector('.state.active').dataset.state === 'verifying') {
         setState('verifying'); // reinicia timer
       }
     });
+
+    // Dispara o timer no load para o estado inicial (verifying)
+    setState('verifying');
   </script>
 </body>
 </html>
