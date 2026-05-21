@@ -162,50 +162,6 @@
       max-width: 320px;
     }
 
-    /* Card de contexto da compra */
-    .purchase-card {
-      width: 100%;
-      max-width: 320px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-align: left;
-      margin-bottom: 24px;
-    }
-    .purchase-thumb {
-      width: 44px; height: 44px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, var(--brand) 0%, #4770EB 100%);
-      flex-shrink: 0;
-    }
-    .purchase-info { flex: 1; min-width: 0; }
-    .purchase-label {
-      font-size: 10px;
-      color: var(--text-soft);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-    .purchase-title {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .purchase-price {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      flex-shrink: 0;
-    }
-
     /* Barra de progresso */
     .progress {
       width: 100%;
@@ -428,15 +384,6 @@
         <h1>Verificando seu acesso</h1>
         <p class="lead">Estamos confirmando que você é uma pessoa real. Isso ajuda a proteger sua compra contra fraudes.</p>
 
-        <div class="purchase-card">
-          <div class="purchase-thumb"></div>
-          <div class="purchase-info">
-            <div class="purchase-label">Sua compra</div>
-            <div class="purchase-title">Curso Completo de Investimentos</div>
-          </div>
-          <div class="purchase-price">R$ 297</div>
-        </div>
-
         <div class="progress"><div class="progress-bar indeterminate"></div></div>
         <p style="font-size: 12px; color: var(--text-soft); margin: 0;">Leva só alguns segundos…</p>
       </div>
@@ -465,15 +412,6 @@
         </div>
         <h1>Confirme que é você</h1>
         <p class="lead">Para continuar com segurança, marque a confirmação abaixo. Sua compra está protegida.</p>
-
-        <div class="purchase-card">
-          <div class="purchase-thumb"></div>
-          <div class="purchase-info">
-            <div class="purchase-label">Sua compra</div>
-            <div class="purchase-title">Curso Completo de Investimentos</div>
-          </div>
-          <div class="purchase-price">R$ 297</div>
-        </div>
 
         <label class="manual-check" for="not-robot">
           <input type="checkbox" id="not-robot" />
