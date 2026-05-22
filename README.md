@@ -1,6 +1,6 @@
-# Checkout Challenge MFA — Redesign
+# Checkout Challenge AWS WAF — Redesign
 
-Mockup HTML standalone do redesign da tela de desafio MFA / AWS WAF Challenge servida em `chk.eduzz.com`.
+Mockup HTML standalone do redesign da tela de AWS WAF Challenge servida em `chk.eduzz.com`.
 
 ## Contexto
 
