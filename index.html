@@ -51,17 +51,60 @@
       align-items: center;
       gap: 12px;
       max-width: 420px;
-      margin: 0 auto;
+      margin: 24px auto 0;
       border-radius: 16px 16px 0 0;
-      margin-top: 24px;
     }
+    .traffic { display: flex; gap: 6px; }
     .browser-chrome .dot { width: 10px; height: 10px; border-radius: 50%; background: #555; }
+    .browser-chrome .dot-red { background: #FF5F57; }
+    .browser-chrome .dot-yellow { background: #FEBC2E; }
+    .browser-chrome .dot-green { background: #28C840; }
+    .browser-chrome .dot-red,
+    .browser-chrome .dot-yellow,
+    .browser-chrome .dot-green { display: none; }
     .url-bar {
       flex: 1; background: #2F2F2F; border-radius: 16px;
       padding: 6px 12px; font-size: 12px; color: #ECECEC;
       display: flex; align-items: center; gap: 6px;
     }
     .url-bar::before { content: "🔒"; font-size: 11px; }
+
+    /* Viewport: desktop */
+    body.viewport-desktop .browser-chrome {
+      max-width: 960px;
+      padding: 14px 18px;
+    }
+    body.viewport-desktop .browser-chrome .dot { display: none; }
+    body.viewport-desktop .browser-chrome .dot-red,
+    body.viewport-desktop .browser-chrome .dot-yellow,
+    body.viewport-desktop .browser-chrome .dot-green { display: block; }
+    body.viewport-desktop .browser-chrome .url-bar {
+      max-width: 520px;
+      margin: 0 auto;
+      flex: 0 1 520px;
+    }
+    body.viewport-desktop .frame {
+      max-width: 960px;
+      min-height: 640px;
+    }
+    body.viewport-desktop .top-bar {
+      padding: 24px 40px;
+    }
+    body.viewport-desktop .content {
+      padding: 64px 40px;
+    }
+    body.viewport-desktop .frame-footer {
+      padding: 20px 40px;
+    }
+    body.viewport-desktop .icon-wrap {
+      width: 112px; height: 112px;
+      margin-bottom: 28px;
+    }
+    body.viewport-desktop .icon-wrap svg { width: 52px; height: 52px; }
+    body.viewport-desktop h1 { font-size: 26px; }
+    body.viewport-desktop .lead { font-size: 15px; max-width: 420px; }
+    body.viewport-desktop .progress,
+    body.viewport-desktop .btn { max-width: 360px; }
 
     /* Container principal */
     .frame {
@@ -512,6 +555,11 @@
 <body>
 
   <div class="browser-chrome">
+    <div class="traffic">
+      <div class="dot dot-red"></div>
+      <div class="dot dot-yellow"></div>
+      <div class="dot dot-green"></div>
+    </div>
     <div class="dot"></div>
     <div class="url-bar">chk.eduzz.com</div>
   </div>
@@ -688,6 +736,12 @@
     <div class="demo-bar-inner">
       <span class="demo-label">⚙️ Demo (fora da UI):</span>
 
+      <span style="font-size: 12px; color: #64748B;">Viewport:</span>
+      <div class="demo-group" id="viewport-group">
+        <button class="demo-btn active" data-viewport="mobile" onclick="setViewport('mobile')">Mobile</button>
+        <button class="demo-btn" data-viewport="desktop" onclick="setViewport('desktop')">Desktop</button>
+      </div>
+
       <span style="font-size: 12px; color: #64748B;">Estado:</span>
       <div class="demo-group" id="state-group">
         <button class="demo-btn active" data-state="verifying" onclick="setState('verifying')">1. Verificando</button>
@@ -709,6 +763,13 @@
   </div>
 
   <script>
+    function setViewport(name) {
+      document.body.classList.toggle('viewport-desktop', name === 'desktop');
+      document.querySelectorAll('#viewport-group .demo-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.viewport === name);
+      });
+    }
+
     function setState(name) {
       document.querySelectorAll('.state').forEach(el => {
         el.classList.toggle('active', el.dataset.state === name);
