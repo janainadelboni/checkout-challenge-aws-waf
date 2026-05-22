@@ -1,0 +1,150 @@
+{
+  "$description": "Design tokens da tela AWS WAF Challenge — EDO-289. Espelha Rootzz onde aplicável.",
+  "color": {
+    "brand": {
+      "default": "#2B4ACF",
+      "dark": "#1F37A8",
+      "soft": "#EAEEFB"
+    },
+    "text": {
+      "default": "#0F1324",
+      "muted": "rgba(15, 19, 36, 0.75)",
+      "soft": "rgba(15, 19, 36, 0.55)"
+    },
+    "surface": {
+      "page": "#F5F6FA",
+      "card": "#FFFFFF"
+    },
+    "border": {
+      "default": "#C7C7C7",
+      "soft": "#E0E0E0"
+    },
+    "feedback": {
+      "success": "#10B981",
+      "successSoft": "#E6F8F2",
+      "danger": "#E11D48",
+      "dangerSoft": "#FCE7EE",
+      "warning": "#F59E0B"
+    },
+    "logo": {
+      "symbol": "#FFBC00",
+      "wordmark": "#0D2772"
+    },
+    "captcha": {
+      "trackBg": "#F3F3F3",
+      "trackBorder": "#DDDDDD",
+      "fillProgress": "#D6E4F5",
+      "fillSolved": "#C6EFCE",
+      "handleSolvedBg": "#4CAF50",
+      "handleSolvedBorder": "#43A047",
+      "errorText": "#9F1239",
+      "errorBorder": "#F5BCCD"
+    }
+  },
+  "radius": {
+    "default": "8px",
+    "sm": "6px",
+    "frame": "16px",
+    "captcha": "2px"
+  },
+  "shadow": {
+    "card": "0 1px 3px rgba(15,19,36,0.04), 0 8px 24px rgba(15,19,36,0.06)",
+    "captchaModal": "0 10px 40px rgba(0,0,0,0.25)"
+  },
+  "spacing": {
+    "frameMaxWidth": "420px",
+    "topBarPadding": "20px 24px",
+    "contentPadding": "32px 24px",
+    "footerPadding": "16px 24px",
+    "iconSize": "96px",
+    "iconSvgSize": "44px",
+    "buttonMaxWidth": "320px",
+    "buttonPadding": "14px 20px"
+  },
+  "typography": {
+    "fontFamily": "'Google Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    "h1": { "size": "22px", "weight": 600, "letterSpacing": "-0.02em" },
+    "lead": { "size": "14px", "weight": 400, "lineHeight": 1.5 },
+    "progressHint": { "size": "12px", "weight": 400 },
+    "button": { "size": "15px", "weight": 600 },
+    "buttonGhost": { "size": "13px", "weight": 500 },
+    "secureBadge": { "size": "11px", "weight": 400 },
+    "footer": { "size": "11px", "weight": 400 },
+    "captchaPrompt": { "size": "13px", "weight": 500 }
+  },
+  "motion": {
+    "spin": { "duration": "1s", "easing": "linear", "iteration": "infinite" },
+    "indeterminate": { "duration": "1.4s", "easing": "ease-in-out", "iteration": "infinite" },
+    "pulseSoft": { "duration": "0.6s", "easing": "ease-out", "iteration": 1 },
+    "fadeIn": { "duration": "0.2s", "easing": "ease", "iteration": 1 },
+    "popIn": { "duration": "0.25s", "easing": "ease", "iteration": 1 },
+    "sliderDropBack": { "duration": "0.25s", "easing": "ease", "iteration": 1 }
+  },
+  "states": [
+    {
+      "id": "verifying",
+      "h1": "Verificando seu acesso",
+      "lead": "Estamos confirmando que você é uma pessoa real. Isso ajuda a proteger sua compra contra fraudes.",
+      "hint": "Leva só alguns segundos…",
+      "icon": "shield",
+      "iconColor": "brand",
+      "spinner": true,
+      "progress": "indeterminate",
+      "autoAdvanceMs": 2500,
+      "autoAdvanceTo": "ready"
+    },
+    {
+      "id": "ready",
+      "h1": "Confirme que é você",
+      "lead": "Toque no botão abaixo para concluir a verificação e seguir com sua compra.",
+      "icon": "shield",
+      "iconColor": "brand",
+      "spinner": false,
+      "cta": { "label": "Sou humano", "variant": "primary", "icon": "check", "goesTo": "captcha" }
+    },
+    {
+      "id": "captcha",
+      "h1": "Verificação adicional",
+      "lead": "Complete o desafio na janela ao lado para confirmar seu acesso. Não feche esta página.",
+      "icon": "shield",
+      "iconColor": "brand",
+      "overlay": "aws-waf",
+      "frameBlur": true,
+      "onSolve": { "delayMs": 600, "goesTo": "success" }
+    },
+    {
+      "id": "success",
+      "h1": "Tudo certo!",
+      "lead": "Verificação concluída. Estamos te levando de volta para finalizar sua compra.",
+      "hint": "Redirecionando…",
+      "icon": "check",
+      "iconColor": "success",
+      "progress": 100,
+      "animation": "pulse-soft"
+    },
+    {
+      "id": "error",
+      "h1": "Não conseguimos verificar",
+      "lead": "A verificação de segurança falhou. Vamos tentar novamente — sua compra está esperando você.",
+      "detail": "Conexão instável, VPN ativa ou bloqueador de scripts. Tente desativar e recarregar a página.",
+      "icon": "x-circle",
+      "iconColor": "danger",
+      "ctas": [
+        { "label": "Tentar novamente", "variant": "primary", "icon": "refresh", "goesTo": "verifying" },
+        { "label": "Preciso de ajuda", "variant": "ghost", "href": "https://eduzz.com/ajuda" }
+      ]
+    }
+  ],
+  "flow": {
+    "happyPath": ["verifying", "ready", "captcha", "success"],
+    "fallback": ["error", "verifying"]
+  },
+  "telemetry": [
+    "waf_challenge_shown",
+    "waf_ready_shown",
+    "waf_user_clicked_human",
+    "waf_captcha_solved",
+    "waf_error_shown",
+    "waf_retry_clicked"
+  ]
+}
