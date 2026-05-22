@@ -411,6 +411,22 @@
       font-size: 11px;
       color: #999;
       justify-content: center;
+      overflow: hidden;
+      user-select: none;
+    }
+    .slider-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 0;
+      background: #D6E4F5;
+      transition: background 0.2s;
+    }
+    .slider-track.solved .slider-fill { background: #C6EFCE; }
+    .slider-track.solved .slider-label { color: #2E7D32; }
+    .slider-label {
+      position: relative;
+      z-index: 1;
+      pointer-events: none;
     }
     .slider-handle {
       position: absolute;
@@ -426,13 +442,20 @@
       justify-content: center;
       box-shadow: 0 1px 3px rgba(0,0,0,0.15);
       cursor: grab;
+      z-index: 2;
+      touch-action: none;
     }
+    .slider-handle:active { cursor: grabbing; }
+    .slider-handle.solved { background: #4CAF50; border-color: #43A047; }
+    .slider-handle.solved::before { content: "✓"; color: white; font-size: 14px; }
     .slider-handle::before {
       content: "›";
       color: #666;
       font-size: 18px;
       font-weight: bold;
     }
+    /* Peça que se move junto com o handle */
+    .puzzle-piece.dragging { transition: none; }
 
     .captcha-controls {
       display: flex;
@@ -617,12 +640,13 @@
 
           <div class="puzzle-stage">
             <div class="puzzle-hole"></div>
-            <div class="puzzle-piece"></div>
+            <div class="puzzle-piece" id="puzzle-piece"></div>
           </div>
 
-          <div class="slider-track">
-            <div class="slider-handle"></div>
-            <span>Arraste para a direita</span>
+          <div class="slider-track" id="slider-track">
+            <div class="slider-fill" id="slider-fill"></div>
+            <div class="slider-handle" id="slider-handle"></div>
+            <span class="slider-label" id="slider-label">Arraste para a direita</span>
           </div>
 
           <div class="captcha-controls">
@@ -696,6 +720,7 @@
       const isCaptcha = name === 'captcha';
       document.getElementById('captcha-overlay').classList.toggle('show', isCaptcha);
       document.querySelector('.frame').classList.toggle('dimmed', isCaptcha);
+      if (isCaptcha && window.__resetCaptcha) window.__resetCaptcha();
 
       if (name === 'verifying' && document.getElementById('auto-success').checked) {
         clearTimeout(window.__autoTimer);
@@ -708,6 +733,123 @@
         setState('verifying'); // reinicia timer
       }
     });
+
+    // ===== Slider do captcha AWS WAF =====
+    (function initSlider() {
+      const track = document.getElementById('slider-track');
+      const handle = document.getElementById('slider-handle');
+      const fill = document.getElementById('slider-fill');
+      const label = document.getElementById('slider-label');
+      const piece = document.getElementById('puzzle-piece');
+
+      const HANDLE_W = 28;
+      const PIECE_START = 20;      // left inicial em px (CSS)
+      const PIECE_TARGET = 60;     // left do hole em px (CSS)
+      const PIECE_TRAVEL = PIECE_TARGET - PIECE_START; // 40px
+
+      let dragging = false;
+      let startX = 0;
+      let startLeft = 4;
+      let solved = false;
+
+      function resetSlider() {
+        solved = false;
+        dragging = false;
+        handle.style.left = '4px';
+        fill.style.width = '0px';
+        label.textContent = 'Arraste para a direita';
+        track.classList.remove('solved');
+        handle.classList.remove('solved');
+        piece.style.left = PIECE_START + 'px';
+        piece.classList.remove('dragging');
+      }
+
+      function pointerDown(e) {
+        if (solved) return;
+        dragging = true;
+        const pt = e.touches ? e.touches[0] : e;
+        startX = pt.clientX;
+        startLeft = parseFloat(handle.style.left) || 4;
+        piece.classList.add('dragging');
+        e.preventDefault();
+      }
+
+      function pointerMove(e) {
+        if (!dragging || solved) return;
+        const pt = e.touches ? e.touches[0] : e;
+        const maxLeft = track.clientWidth - HANDLE_W - 4;
+        let newLeft = startLeft + (pt.clientX - startX);
+        newLeft = Math.max(4, Math.min(maxLeft, newLeft));
+        handle.style.left = newLeft + 'px';
+        fill.style.width = (newLeft + HANDLE_W) + 'px';
+
+        // Move a peça do puzzle proporcionalmente
+        const progress = (newLeft - 4) / (maxLeft - 4);
+        piece.style.left = (PIECE_START + progress * PIECE_TRAVEL) + 'px';
+
+        // Detecta sucesso ao chegar no fim
+        if (progress >= 0.98) {
+          solveSlider(maxLeft);
+        }
+      }
+
+      function pointerUp() {
+        if (!dragging || solved) {
+          dragging = false;
+          return;
+        }
+        dragging = false;
+        // Se não chegou ao fim, volta ao início
+        const currentLeft = parseFloat(handle.style.left) || 4;
+        const maxLeft = track.clientWidth - HANDLE_W - 4;
+        if (currentLeft < maxLeft * 0.98) {
+          handle.style.transition = 'left 0.25s ease';
+          fill.style.transition = 'width 0.25s ease';
+          piece.style.transition = 'left 0.25s ease';
+          handle.style.left = '4px';
+          fill.style.width = '0px';
+          piece.style.left = PIECE_START + 'px';
+          setTimeout(() => {
+            handle.style.transition = '';
+            fill.style.transition = '';
+            piece.style.transition = '';
+            piece.classList.remove('dragging');
+          }, 260);
+        }
+      }
+
+      function solveSlider(maxLeft) {
+        solved = true;
+        dragging = false;
+        handle.style.left = maxLeft + 'px';
+        fill.style.width = '100%';
+        piece.style.left = PIECE_TARGET + 'px';
+        track.classList.add('solved');
+        handle.classList.add('solved');
+        label.textContent = 'Verificado';
+        // Fecha o captcha e vai pra sucesso após pequena pausa
+        setTimeout(() => {
+          document.getElementById('captcha-overlay').classList.remove('show');
+          setState('success');
+          // Reseta o slider pra próxima vez que o captcha for aberto
+          setTimeout(resetSlider, 400);
+        }, 600);
+      }
+
+      handle.addEventListener('mousedown', pointerDown);
+      handle.addEventListener('touchstart', pointerDown, { passive: false });
+      document.addEventListener('mousemove', pointerMove);
+      document.addEventListener('touchmove', pointerMove, { passive: false });
+      document.addEventListener('mouseup', pointerUp);
+      document.addEventListener('touchend', pointerUp);
+
+      // Botão de recarregar dentro do captcha
+      document.querySelector('.captcha-controls button[title="Recarregar"]')
+        .addEventListener('click', resetSlider);
+
+      // Sempre que o captcha for reaberto pela DemoBar, reseta
+      window.__resetCaptcha = resetSlider;
+    })();
 
     // Dispara o timer no load para o estado inicial (verifying)
     setState('verifying');
